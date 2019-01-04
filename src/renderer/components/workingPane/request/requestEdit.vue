@@ -40,24 +40,31 @@
                         <form>
                             <div class="form-group">
                                 <label>Body</label>
-                                <textarea class="form-control" aria-label="post"></textarea>
+                                <app-editor lang="json" v-model=tmpBody height="200px"></app-editor>
                             </div>
                             <div class="form-group">
                                 <label>Headers</label>
-                                <textarea class="form-control" aria-label="headers"></textarea>
+                                <app-editor lang="json" v-model=tmpBody height="200px"></app-editor>
                             </div>
                         </form>
 
                     </tabs-tab-content>
                     <tabs-tab-content id="response">
-                        <div class="answer-area">
-                            <div v-if="!request.error">
-                                <VueJsonPretty :data="request.response"></VueJsonPretty>
-                            </div>
-                            <div v-else>
-                                {{request.error}}
-                            </div>
-                        </div>
+                        <template v-if="!request.error">
+                            <template v-if="request.responseBlob">
+                                <app-editor
+                                    lang="json"
+                                    height="450px"
+                                    :value=request.responseBlob
+                                    :read-only=true></app-editor>
+                            </template>
+                            <template v-else>
+                                Send request to server..
+                            </template>
+                        </template>
+                        <template v-else>
+                            {{request.error}}
+                        </template>
                     </tabs-tab-content>
                 </template>
             </tabs>
@@ -69,32 +76,33 @@
 </template>
 
 <script>
-  import VueJsonPretty from 'vue-json-pretty'
   import {mapState} from 'vuex'
   import RequestSettingsBar from './requestSettingsBar'
   import Tabs from '../../shared/tabs'
   import TabsTab from '../../shared/tabs-tab'
   import TabsTabContent from '../../shared/tabs-tab-content'
+  import AppEditor from '../../shared/editor'
   export default {
     name: 'request-edit',
     data () {
       return {
-        activeTab: 'response'
+        activeTab: 'response',
+        tmpBody: '',
+        tmpHeaders: ''
       }
     },
     components: {
+      AppEditor,
       TabsTabContent,
       TabsTab,
       Tabs,
-      RequestSettingsBar,
-      VueJsonPretty
+      RequestSettingsBar
     },
     computed: {
       ...mapState({
         'activeId': state => state.requests.activeId,
         'list': state => state.requests.list
       }),
-
       request () {
         return this.list.find((request) => {
           return request.id === this.activeId
@@ -103,16 +111,3 @@
     }
   }
 </script>
-
-
-<style>
-    .answer-area {
-        height: 100%;
-        overflow: auto;
-        max-height: 500px;
-        padding: 5px;
-        border: 1px solid;
-        background-color: #f8f8f8;
-        color: black;
-    }
-</style>

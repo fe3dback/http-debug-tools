@@ -1,9 +1,9 @@
 {
   "name": "http-dev-tools",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "fe3dback <fe3dback@yandex.ru>",
   "description": "HTTP Development tools with debug bar (sql, logs, templates, routes, etc..)",
-  "license": null,
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
@@ -60,8 +60,8 @@
     "uuid4": "^1.1.4",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
-    "vue-json-pretty": "^1.4.1",
     "vue-router": "^3.0.1",
+    "vue2-ace-editor": "0.0.13",
     "vuex": "^3.0.1",
     "vuex-electron": "^1.0.0"
   },

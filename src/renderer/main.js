@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+// app static
 import './../../static/bootstrap-4.2.1-dist/css/bootstrap.min.css'
 import './../../static/fontawesome-free-5.6.3-web/css/all.min.css'
 
