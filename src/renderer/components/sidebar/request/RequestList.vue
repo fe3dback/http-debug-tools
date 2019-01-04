@@ -1,11 +1,6 @@
 <template>
     <div class="request-list">
         <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action" @click="requestCreate">
-                <span class="text-success">
-                    <i class="fa fa-plus"></i> Create HTTP Request
-                </span>
-            </a>
             <a
                 class="list-group-item list-group-item-action"
                 :class="{'active': request.id === activeId}"
@@ -25,13 +20,21 @@
                 </span>
             </a>
         </div>
+        <sidebar-model-actions
+            :id="activeId"
+            :hide-edit=true
+            v-on:create="requestCreate"
+            v-on:delete="requestDeleteActive"
+        ></sidebar-model-actions>
     </div>
 </template>
 
 <script>
     import {mapState, mapActions} from 'vuex'
+    import SidebarModelActions from '../sidebar-model-actions'
     export default {
       name: 'request-list',
+      components: {SidebarModelActions},
       computed: {
         ...mapState({
           'list': state => state.requests.list,
@@ -40,7 +43,9 @@
       },
       methods: {
         ...mapActions([
-          'requestCreate'
+          'requestCreate',
+          'requestDeselect',
+          'requestDeleteActive'
         ])
       }
     }

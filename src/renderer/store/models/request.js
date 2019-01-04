@@ -1,22 +1,16 @@
 import store from '../index'
 import uuid4 from 'uuid4'
+import Response from './response'
+import fetch from 'node-fetch'
 
 const Request = function (method, url) {
   // request
   this.id = uuid4()
   this.url = url
   this.method = method
-
-  // response
-  this.response = null
-  this.responseBlob = null
-  this.responseCode = 0
-  this.responseTime = 0
-
-  // misc
-  this.error = null
-
-  console.log('new request model', this)
+  this.body = '{}'
+  this.headers = '{}'
+  this.lastResponseId = null
 }
 
 Request.prototype.methods = function () {
@@ -38,36 +32,22 @@ Request.prototype.methodType = function () {
   }
 }
 
-Request.prototype.statusColor = function () {
-  if (this.responseCode >= 500) {
-    return 'red'
-  } else if (this.responseCode >= 400) {
-    return 'orange'
-  } else if (this.responseCode >= 300) {
-    return 'yellow'
-  } else if (this.responseCode >= 200) {
-    return 'lime'
-  }
-  return 'white'
-}
-
 Request.prototype.send = function () {
   let tStart = performance.now()
-
   fetch(this.url)
     .then((res) => {
       let tEnd = performance.now()
+      let response = new Response(res, tEnd - tStart)
+
+      store.dispatch('responseAdd', response)
       store.dispatch('requestSetResponse', {
         id: this.id,
-        response: res,
-        time: tEnd - tStart
+        responseId: response.id
       })
     })
     .catch((reason) => {
-      store.dispatch('requestSetResponse', {
-        id: this.id,
-        error: `Cant make request: ${reason}`
-      })
+      // todo show warning
+      console.error(reason)
     })
 }
 

@@ -57,6 +57,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "content-type-parser": "^1.0.2",
+    "node-fetch": "^2.3.0",
     "uuid4": "^1.1.4",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",

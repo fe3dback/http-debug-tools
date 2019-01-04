@@ -1,7 +1,7 @@
 <template>
     <editor
-        v-bind:value=value
-        v-on:input="$emit('input', $event.target.value)"
+        v-bind:value="value"
+        v-on:input=onInput
         :lang=lang
 
         theme="github"
@@ -24,13 +24,21 @@
           require('brace/ext/language_tools')
           require('brace/mode/html')
           require('brace/mode/json')
-          require('brace/theme/github')
+          require('brace/mode/xml')
+          require('brace/theme/solarized_dark')
           require('brace/snippets/javascript')
 
-          editor.setTheme('ace/theme/github')
+          editor.setTheme('ace/theme/solarized_dark')
           editor.session.setMode(`ace/mode/${this.lang}`)
           editor.setFontSize(18)
           editor.setReadOnly(this.readOnly === true)
+        },
+
+        onInput (e) {
+          if (e && e.target) {
+            let val = e.target.value || ''
+            this.$emit('input', val)
+          }
         }
       }
     }

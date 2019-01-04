@@ -8,12 +8,21 @@ let applyFor = function (id, cb) {
   })
 }
 
+let applyForResponse = function (id, cb) {
+  state.responses.map(function (r) {
+    if (r.id === id) {
+      cb(r)
+    }
+  })
+}
+
 const state = {
   activeId: null,
   list: [
     new Request('GET', 'https://google.com'),
     new Request('POST', 'https://crib.carmoney.ru/')
-  ]
+  ],
+  responses: []
 }
 
 const mutations = {
@@ -23,30 +32,20 @@ const mutations = {
     )
   },
 
-  REQUEST_CLEAR (state, id) {
-    applyFor(id, (req) => {
-      req.error = null
-      req.responseCode = 0
-      req.responseTime = 0
-      req.responseBlob = null
-      req.response = null
-    })
+  REQUEST_DESELECT (state) {
+    state.activeId = null
   },
 
-  REQUEST_SHOW_ERROR (state, {id, error}) {
-    mutations.REQUEST_CLEAR(state, id)
-    applyFor(id, (req) => {
-      req.error = error
+  REQUEST_DELETE_ACTIVE (state) {
+    state.list = state.list.filter(function (request) {
+      return request.id !== state.activeId
     })
+    mutations.REQUEST_DESELECT(state)
   },
 
-  REQUEST_SHOW_RESPONSE (state, {id, blob, json, time, code}) {
-    mutations.REQUEST_CLEAR(state, id)
+  REQUEST_SET_RESPONSE_ID (state, {id, responseId}) {
     applyFor(id, (req) => {
-      req.responseCode = code
-      req.responseTime = (time).toFixed(2)
-      req.responseBlob = blob
-      req.response = json
+      req.lastResponseId = responseId
     })
   },
 
@@ -64,12 +63,31 @@ const mutations = {
     applyFor(id, (req) => {
       req.method = newMethod
     })
+  },
+
+  RESPONSE_ADD (state, response) {
+    state.responses.push(response)
+  },
+
+  RESPONSE_INIT (state, {id, blob, parsed, type}) {
+    applyForResponse(id, (res) => {
+      res.blob = blob
+      res.parsed = parsed
+      res.type = type
+    })
   }
 }
 
 const actions = {
   requestCreate ({ commit }) { commit('REQUEST_CREATE') },
+  requestDeselect ({ commit }) { commit('REQUEST_DESELECT') },
+  requestDeleteActive ({ commit }) {
+    if (!confirm('Delete this request? You are sure?')) {
+      return
+    }
 
+    commit('REQUEST_DELETE_ACTIVE')
+  },
   requestSetActive ({ commit }, id) { commit('REQUEST_SET_ACTIVE', id) },
 
   requestSetUrl ({ commit }, {id, newUrl}) {
@@ -80,38 +98,13 @@ const actions = {
     commit('REQUEST_EDIT_METHOD', {id, newMethod})
   },
 
-  requestSetResponse ({ commit }, {id, error, response, time}) {
-    if (!id) {
-      return
-    }
+  requestSetResponse ({ commit }, {id, responseId}) {
+    commit('REQUEST_SET_RESPONSE_ID', {id, responseId})
+  },
 
-    if (error) {
-      return commit('REQUEST_SHOW_ERROR', {id, error})
-    }
-
-    if (!response) {
-      return commit('REQUEST_SHOW_ERROR', {id, error: 'Not found response'})
-    }
-
-    response.text()
-      .then((blob) => {
-        let json = null
-        try {
-          json = JSON.parse(blob)
-        } catch (e) {
-          return commit('REQUEST_SHOW_ERROR', {
-            id,
-            error: `Cant parse answer: "${e}" - example of output: - "${blob.substr(0, 128)}"...`
-          })
-        }
-
-        return commit('REQUEST_SHOW_RESPONSE', {
-          id, time, blob, json, code: response.status
-        })
-      })
-      .catch((reason) => {
-        return commit('REQUEST_SHOW_ERROR', {id, error: `Cant get response: ${reason}`})
-      })
+  responseAdd ({ commit }, response) { commit('RESPONSE_ADD', response) },
+  responseInit ({ commit }, {id, blob, parsed, type}) {
+    commit('RESPONSE_INIT', {id, blob, parsed, type})
   }
 }
 
