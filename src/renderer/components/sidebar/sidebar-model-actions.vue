@@ -1,23 +1,36 @@
 <template>
     <div class="btn-group w-100">
-        <div class="btn btn-sm w-25" @click="$emit('create')">
-            <i class="fa fa-plus"></i> Create
-        </div>
-        <div class="btn btn-sm w-25" @click="$emit('edit')" v-if="id && hideEdit !== true">
-            <i class="fa fa-edit"></i> Edit
-        </div>
-        <div class="btn btn-sm w-25" @click="$emit('copy')" v-if="id">
-            <i class="fa fa-copy"></i> Copy
-        </div>
-        <div class="btn btn-sm w-25" @click="$emit('delete')" v-if="id">
-            <i class="fa fa-trash"></i> Delete
-        </div>
+        <sidebar-model-actions-btn
+                icon="plus"
+                title="Create"
+                @click="$emit('create')">
+        </sidebar-model-actions-btn>
+        <sidebar-model-actions-btn
+                icon="edit"
+                title="Edit"
+                @click="$emit('edit')"
+                v-if="id && hideEdit !== true">
+        </sidebar-model-actions-btn>
+        <sidebar-model-actions-btn
+                icon="clone"
+                title="Clone"
+                @click="$emit('clone')"
+                v-if="id">
+        </sidebar-model-actions-btn>
+        <sidebar-model-actions-btn
+                icon="trash"
+                title="Delete"
+                @click="$emit('delete')"
+                v-if="id">
+        </sidebar-model-actions-btn>
     </div>
 </template>
 
 <script>
+    import SidebarModelActionsBtn from './sidebar-model-actions-btn'
     export default {
       name: 'sidebar-model-actions',
+      components: {SidebarModelActionsBtn},
       props: ['id', 'hideEdit']
     }
 </script>

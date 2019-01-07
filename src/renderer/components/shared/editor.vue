@@ -32,9 +32,17 @@
           editor.session.setMode(`ace/mode/${this.lang}`)
           editor.setFontSize(18)
           editor.setReadOnly(this.readOnly === true)
+          editor.session.setOptions({
+            tabSize: 2,
+            useSoftTabs: true
+          })
         },
 
         onInput (e) {
+          if ((typeof e) === 'string') {
+            return this.$emit('input', e)
+          }
+
           if (e && e.target) {
             let val = e.target.value || ''
             this.$emit('input', val)

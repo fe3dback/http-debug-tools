@@ -5,27 +5,30 @@
         <sidebar-card title="Environments">
           <environment-list></environment-list>
         </sidebar-card>
+        <sidebar-card title="Variables">
+          <environment-vars></environment-vars>
+        </sidebar-card>
         <sidebar-card title="Requests">
           <request-list></request-list>
         </sidebar-card>
         <sidebar-card title="Application db">
           <div class="btn-group">
-            <div class="btn btn-sm">
-              <i class="fa fa-file-import"></i>
-              Import..
-            </div>
-            <div class="btn btn-sm">
-              <i class="fa fa-file-export"></i>
-              Export..
-            </div>
-            <div class="btn btn-sm">
-              <i class="fa fa-download"></i>
-              Save
-            </div>
-            <div class="btn btn-sm">
-              <i class="fa fa-upload"></i>
-              Load
-            </div>
+            <sidebar-model-actions-btn
+              title="Import.."
+              icon="file-import">
+            </sidebar-model-actions-btn>
+            <sidebar-model-actions-btn
+              title="Export.."
+              icon="file-export">
+            </sidebar-model-actions-btn>
+            <sidebar-model-actions-btn
+              title="Save"
+              icon="download">
+            </sidebar-model-actions-btn>
+            <sidebar-model-actions-btn
+              title="Load"
+              icon="upload">
+            </sidebar-model-actions-btn>
           </div>
         </sidebar-card>
       </div>
@@ -41,9 +44,13 @@
   import WorkingPane from './workingPane/workingPane'
   import SidebarCard from './sidebar/sidebar-card'
   import EnvironmentList from './sidebar/environment/EnvironmentList'
+  import EnvironmentVars from './sidebar/environment/EnvironmentVars'
+  import SidebarModelActionsBtn from './sidebar/sidebar-model-actions-btn'
   export default {
     name: 'landing-page',
     components: {
+      SidebarModelActionsBtn,
+      EnvironmentVars,
       EnvironmentList,
       SidebarCard,
       WorkingPane,

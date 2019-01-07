@@ -1,5 +1,13 @@
 import Environment from '../models/environment'
 
+let applyFor = function (id, cb) {
+  state.list.map(function (env) {
+    if (env.id === id) {
+      cb(env)
+    }
+  })
+}
+
 const state = {
   activeId: null,
   list: [
@@ -10,9 +18,9 @@ const state = {
 
 const mutations = {
   ENV_CREATE (state) {
-    state.list.push(
-      new Environment('My new env')
-    )
+    let newEnv = new Environment('My new env')
+    state.list.push(newEnv)
+    mutations.ENV_SET_ACTIVE(state, newEnv.id)
   },
 
   ENV_SET_ACTIVE (state, id) {
@@ -28,6 +36,24 @@ const mutations = {
       return env.id !== state.activeId
     })
     mutations.ENV_DESELECT(state)
+  },
+
+  ENV_CLONE_ACTIVE (state) {
+    if (!state.activeId) {
+      return
+    }
+
+    applyFor(state.activeId, (env) => {
+      let newEnv = env.clone()
+      state.list.push(newEnv)
+      mutations.ENV_SET_ACTIVE(state, newEnv.id)
+    })
+  },
+
+  ENV_UPDATE_VARIABLES (state, {id, vars}) {
+    applyFor(id, (env) => {
+      env.data = vars
+    })
   }
 }
 
@@ -40,6 +66,12 @@ const actions = {
     }
 
     commit('ENV_DELETE_ACTIVE')
+  },
+  envCloneActive ({ commit }) {
+    commit('ENV_CLONE_ACTIVE')
+  },
+  envUpdateVariables ({ commit }, {id, vars}) {
+    commit('ENV_UPDATE_VARIABLES', {id, vars})
   }
 }
 
