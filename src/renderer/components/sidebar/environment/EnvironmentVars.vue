@@ -15,43 +15,14 @@
 </template>
 
 <script>
-    import {getComputedVariables} from '../../../store/models/environment'
-    import {mapState} from 'vuex'
+    import {mapGetters} from 'vuex'
     export default {
       name: 'environment-vars',
       computed: {
-        ...mapState({
-          'list': state => state.environments.list,
-          'activeId': state => state.environments.activeId
-        }),
-
-        currentEnv () {
-          return this.list.find((env) => {
-            return env.id === this.activeId
-          })
-        },
-
-        currentEnvVars () {
-          if (!this.currentEnv) {
-            return
-          }
-
-          return getComputedVariables(this.currentEnv)
-        },
-
-        currentEnvVarsIsEmpty () {
-          if (!this.currentEnvVars) {
-            return true
-          }
-
-          for (let key in this.currentEnvVars) {
-            if (Object.prototype.hasOwnProperty.call(this.currentEnvVars, key)) {
-              return false
-            }
-          }
-
-          return true
-        }
+        ...mapGetters([
+          'currentEnvVars',
+          'currentEnvVarsIsEmpty'
+        ])
       }
     }
 </script>

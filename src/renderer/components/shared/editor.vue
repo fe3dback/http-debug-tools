@@ -1,7 +1,7 @@
 <template>
     <editor
         v-bind:value="value"
-        v-on:input.prevent=onInput
+        v-on:input=onInput
         :lang=lang
 
         theme="github"
@@ -32,7 +32,8 @@
           editor.session.setMode(`ace/mode/${this.lang}`)
           editor.setFontSize(18)
           editor.setReadOnly(this.readOnly === true)
-          editor.session.setOptions({
+          editor.getSession().setUseWrapMode(true)
+          editor.getSession().setOptions({
             tabSize: 2,
             useSoftTabs: true
           })

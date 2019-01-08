@@ -118,6 +118,10 @@ const menu = Menu.buildFromTemplate([
       {
         label: 'Git repo',
         click () { require('electron').shell.openExternal('https://github.com/fe3dback/http-debug-tools') }
+      },
+      {
+        label: 'v.0.2 (alpha)',
+        enabled: false
       }
     ]
   }

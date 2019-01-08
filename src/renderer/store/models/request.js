@@ -26,6 +26,13 @@ export function unserialize (state) {
   return req
 }
 
+export function clone (srcReq) {
+  let newReq = new Request(srcReq.method, srcReq.url)
+  newReq.body = srcReq.body
+  newReq.headers = srcReq.headers
+  return newReq
+}
+
 export function requestHTTPMethods () {
   return [
     'GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'

@@ -6,28 +6,32 @@
         </tabs-tab>
         <tabs-tab id="response-raw">Raw</tabs-tab>
         <tabs-tab id="response-headers">Headers</tabs-tab>
+        <tabs-tab id="response-cat">Cat</tabs-tab>
 
         <template slot="content">
             <tabs-tab-content id="response-body">
-                <app-editor v-if="response.parsed || response.blob"
-                    height="450px"
-                    :lang=response.type
+                <response-preview-editor
                     :value="response.parsed || response.blob"
-                    :read-only=true></app-editor>
+                    :lang=response.type
+                    not-exist-msg="Response body empty or not valid (unknown format, parse errors..). Try to check raw response">
+                </response-preview-editor>
             </tabs-tab-content>
             <tabs-tab-content id="response-raw">
-                <app-editor v-if="response.blob"
-                    height="450px"
+                <response-preview-editor
+                    :value="response.blob"
                     lang="text"
-                    :value=response.blob
-                    :read-only=true></app-editor>
+                    not-exist-msg="Response body is empty">
+                </response-preview-editor>
             </tabs-tab-content>
             <tabs-tab-content id="response-headers">
-                <app-editor v-if="headers"
-                    height="450px"
+                <response-preview-editor
+                    :value="headers"
                     lang="json"
-                    :value=headers
-                    :read-only=true></app-editor>
+                    not-exist-msg="Headers is empty">
+                </response-preview-editor>
+            </tabs-tab-content>
+            <tabs-tab-content id="response-cat">
+                <img :src=catUrl :alt=request.code width="500px"/>
             </tabs-tab-content>
         </template>
     </tabs>
@@ -38,13 +42,17 @@
     import Tabs from '../../shared/tabs'
     import TabsTab from '../../shared/tabs-tab'
     import TabsTabContent from '../../shared/tabs-tab-content'
+    import ResponsePreviewEditor from './responsePreviewEditor'
     export default {
       name: 'response-preview',
-      components: {TabsTabContent, TabsTab, Tabs, AppEditor},
+      components: {ResponsePreviewEditor, TabsTabContent, TabsTab, Tabs, AppEditor},
       props: ['request', 'response'],
       computed: {
         headers () {
           return JSON.stringify(this.response.headers, null, 2)
+        },
+        catUrl () {
+          return `https://http.cat/${this.response.code}`
         }
       }
     }

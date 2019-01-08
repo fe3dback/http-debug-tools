@@ -40,7 +40,8 @@ let init = function (response, blob) {
       }
     } catch (e) {
       // todo show warning message
-      console.error(e)
+      console.warn(e)
+      type = TYPE_TEXT
     }
   }
 

@@ -3,8 +3,7 @@
         <template v-if="request">
             <request-settings-bar :request=request></request-settings-bar>
 
-            <tabs active-tab-id="response">
-                <tabs-tab id="debug">*</tabs-tab>
+            <tabs active-tab-id="request">
                 <tabs-tab id="request">Request</tabs-tab>
                 <tabs-tab id="response">
                     Response
@@ -34,12 +33,6 @@
                     ACL
                 </tabs-tab>
                 <template slot="content">
-                    <tabs-tab-content id="debug">
-                        <div class="debug-zone">
-                            <pre>{{request}}</pre>
-                            <pre>{{response}}</pre>
-                        </div>
-                    </tabs-tab-content>
                     <tabs-tab-content id="request">
                         <form>
                             <div class="form-group">

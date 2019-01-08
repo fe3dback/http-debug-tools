@@ -1,4 +1,4 @@
-import Request, {serialize, unserialize} from '../models/request'
+import Request, {serialize, unserialize, clone} from '../models/request'
 
 let applyFor = function (id, cb) {
   state.list.map(function (r) {
@@ -20,6 +20,14 @@ const state = {
   activeId: null,
   list: [],
   responses: []
+}
+
+const getters = {
+  activeRequest: (state) => {
+    return state.list.find((req) => {
+      return req.id === state.activeId
+    })
+  }
 }
 
 export function exportState () {
@@ -51,7 +59,7 @@ const mutations = {
 
   REQUEST_CREATE (state) {
     state.list.push(
-      new Request('DELETE', 'https://google.com/1234')
+      new Request('GET', 'https://example.com/?foo=bar')
     )
   },
 
@@ -69,6 +77,18 @@ const mutations = {
       return request.id !== state.activeId
     })
     mutations.REQUEST_DESELECT(state)
+  },
+
+  REQUEST_CLONE_ACTIVE (state) {
+    if (!state.activeId) {
+      return
+    }
+
+    applyFor(state.activeId, (req) => {
+      let newReq = clone(req)
+      state.list.push(newReq)
+      mutations.REQUEST_SET_ACTIVE(state, newReq.id)
+    })
   },
 
   REQUEST_SET_RESPONSE_ID (state, {id, responseId}) {
@@ -123,6 +143,7 @@ const actions = {
   requestCreate ({ commit }) { commit('REQUEST_CREATE') },
   requestAdd ({ commit }, req) { commit('REQUEST_ADD', req) },
   requestDeselect ({ commit }) { commit('REQUEST_DESELECT') },
+  requestCloneActive ({ commit }) { commit('REQUEST_CLONE_ACTIVE') },
   requestDeleteActive ({ commit }) {
     if (!confirm('Delete this request? You are sure?')) {
       return
@@ -145,6 +166,7 @@ const actions = {
 
 export default {
   state,
+  getters,
   mutations,
   actions
 }

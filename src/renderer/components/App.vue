@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid root-app">
     <div class="row h-100">
-      <div class="col-4 col-lg-3 sidebar pt-2">
+      <div class="col-4 col-xl-3 sidebar pt-2">
         <sidebar-card title="Environments">
           <environment-list></environment-list>
         </sidebar-card>
@@ -12,7 +12,7 @@
           <request-list></request-list>
         </sidebar-card>
       </div>
-      <div class="col-8 col-lg-9">
+      <div class="col-8 col-xl-9">
         <working-pane></working-pane>
       </div>
     </div>

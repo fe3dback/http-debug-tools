@@ -1,4 +1,4 @@
-import Environment, {clone, serialize, unserialize} from '../models/environment'
+import Environment, {clone, serialize, unserialize, getComputedVariables} from '../models/environment'
 
 let applyFor = function (id, cb) {
   state.list.map(function (env) {
@@ -11,6 +11,36 @@ let applyFor = function (id, cb) {
 const state = {
   activeId: null,
   list: []
+}
+
+const getters = {
+  activeEnv: (state) => {
+    return state.list.find((env) => {
+      return env.id === state.activeId
+    })
+  },
+
+  currentEnvVars: (state, getters) => {
+    if (!getters.activeEnv) {
+      return {}
+    }
+
+    return getComputedVariables(getters.activeEnv)
+  },
+
+  currentEnvVarsIsEmpty: (state, getters) => {
+    if (Object.getOwnPropertyNames(getters.currentEnvVars).length <= 0) {
+      return true
+    }
+
+    for (let key in getters.currentEnvVars) {
+      if (getters.currentEnvVars.hasOwnProperty(key)) {
+        return false
+      }
+    }
+
+    return true
+  }
 }
 
 export function exportState () {
@@ -105,6 +135,7 @@ const actions = {
 
 export default {
   state,
+  getters,
   mutations,
   actions
 }
