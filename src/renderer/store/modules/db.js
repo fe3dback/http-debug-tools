@@ -7,6 +7,13 @@ const state = {
   application: 'http-debug-tools'
 }
 
+export function exportState () {
+  return {
+    version: state.version,
+    application: state.application
+  }
+}
+
 const mutations = {}
 const actions = {}
 

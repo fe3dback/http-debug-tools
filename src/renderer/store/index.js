@@ -1,15 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VuexUndoRedo from 'vuex-undo-redo'
 
-import modules from './modules'
+import modules, {exportState, importState} from './modules'
 import ipcBridge from './plugins/ipc-bridge'
 
 Vue.use(Vuex)
-Vue.use(VuexUndoRedo)
-
-export default new Vuex.Store({
+let store = new Vuex.Store({
   modules,
-  plugins: [ipcBridge],
+  plugins: [ipcBridge(exportState, importState)],
   strict: process.env.NODE_ENV !== 'production'
 })
+
+export default store

@@ -1,4 +1,4 @@
-import Environment, {clone} from '../models/environment'
+import Environment, {clone, serialize, unserialize} from '../models/environment'
 
 let applyFor = function (id, cb) {
   state.list.map(function (env) {
@@ -10,17 +10,43 @@ let applyFor = function (id, cb) {
 
 const state = {
   activeId: null,
-  list: [
-    new Environment('Production'),
-    new Environment('Local')
-  ]
+  list: []
+}
+
+export function exportState () {
+  return {
+    list: state.list.map((env) => {
+      return serialize(env)
+    })
+  }
+}
+
+export function importState (store, moduleState) {
+  store.dispatch('envClear')
+
+  if (moduleState.list) {
+    moduleState.list.forEach((serializedEnv) => {
+      let env = unserialize(serializedEnv)
+      store.dispatch('envAdd', env)
+    })
+  }
 }
 
 const mutations = {
+  ENV_CLEAR (state) {
+    state.activeId = null
+    state.list = []
+  },
+
   ENV_CREATE (state) {
     let newEnv = new Environment('My new env')
     state.list.push(newEnv)
     mutations.ENV_SET_ACTIVE(state, newEnv.id)
+  },
+
+  ENV_ADD (state, env) {
+    state.list.push(env)
+    mutations.ENV_SET_ACTIVE(state, env.id)
   },
 
   ENV_SET_ACTIVE (state, id) {
@@ -58,7 +84,9 @@ const mutations = {
 }
 
 const actions = {
+  envClear ({ commit }) { commit('ENV_CLEAR') },
   envCreate ({ commit }) { commit('ENV_CREATE') },
+  envAdd ({ commit }, env) { commit('ENV_ADD', env) },
   envSetActive ({ commit }, id) { commit('ENV_SET_ACTIVE', id) },
   envDeleteActive ({ commit }) {
     if (!confirm('Delete this environment? You are sure?')) {

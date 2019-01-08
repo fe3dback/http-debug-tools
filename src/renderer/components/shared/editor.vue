@@ -1,7 +1,7 @@
 <template>
     <editor
         v-bind:value="value"
-        v-on:input=onInput
+        v-on:input.prevent=onInput
         :lang=lang
 
         theme="github"
@@ -43,10 +43,12 @@
             return this.$emit('input', e)
           }
 
-          if (e && e.target) {
-            let val = e.target.value || ''
-            this.$emit('input', val)
+          if (e && e.target && e.target.value) {
+            let val = `${e.target.value}` || ''
+            return this.$emit('input', val)
           }
+
+          return this.$emit('input', '')
         }
       }
     }

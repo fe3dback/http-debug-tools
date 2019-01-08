@@ -44,11 +44,21 @@
                         <form>
                             <div class="form-group">
                                 <label>Body:</label>
-                                <app-editor lang="json" v-model=request.body height="200px"></app-editor>
+                                <app-editor
+                                    lang="json"
+                                    :value=request.body
+                                    @input=onEditBody
+                                    height="200px">
+                                </app-editor>
                             </div>
                             <div class="form-group">
                                 <label>Headers:</label>
-                                <app-editor lang="json" v-model=request.headers height="200px"></app-editor>
+                                <app-editor
+                                    lang="json"
+                                    :value=request.headers
+                                    @input=onEditHeaders
+                                    height="200px">
+                                </app-editor>
                             </div>
                         </form>
                     </tabs-tab-content>
@@ -86,7 +96,7 @@
 </template>
 
 <script>
-  import {mapState} from 'vuex'
+  import {mapState, mapActions} from 'vuex'
   import RequestSettingsBar from './requestSettingsBar'
   import Tabs from '../../shared/tabs'
   import TabsTab from '../../shared/tabs-tab'
@@ -111,6 +121,10 @@
       RequestSettingsBar
     },
     methods: {
+      ...mapActions([
+        'requestSetBody',
+        'requestSetHeaders'
+      ]),
       getCodeClassType (response) {
         if (response.code >= 500) {
           return 'danger'
@@ -122,6 +136,18 @@
           return 'success'
         }
         return 'secondary'
+      },
+      onEditBody (newBody) {
+        this.requestSetBody({
+          id: this.request.id,
+          newBody
+        })
+      },
+      onEditHeaders (newHeaders) {
+        this.requestSetHeaders({
+          id: this.request.id,
+          newHeaders
+        })
       }
     },
     computed: {

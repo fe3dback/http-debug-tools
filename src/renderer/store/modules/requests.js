@@ -1,4 +1,4 @@
-import Request from '../models/request'
+import Request, {serialize, unserialize} from '../models/request'
 
 let applyFor = function (id, cb) {
   state.list.map(function (r) {
@@ -18,18 +18,46 @@ let applyForResponse = function (id, cb) {
 
 const state = {
   activeId: null,
-  list: [
-    new Request('GET', 'https://google.com'),
-    new Request('POST', 'https://crib.carmoney.ru/')
-  ],
+  list: [],
   responses: []
 }
 
+export function exportState () {
+  return {
+    list: state.list.map((req) => {
+      console.log('export', req)
+      return serialize(req)
+    })
+  }
+}
+
+export function importState (store, moduleState) {
+  store.dispatch('requestClear')
+
+  if (moduleState.list) {
+    moduleState.list.forEach((serializedReq) => {
+      let req = unserialize(serializedReq)
+      store.dispatch('requestAdd', req)
+    })
+  }
+}
+
 const mutations = {
+  REQUEST_CLEAR (state) {
+    state.activeId = null
+    state.list = []
+    state.responses = []
+  },
+
   REQUEST_CREATE (state) {
     state.list.push(
       new Request('DELETE', 'https://google.com/1234')
     )
+  },
+
+  REQUEST_ADD (state, req) {
+    state.list.push(req)
+    mutations.REQUEST_SET_ACTIVE(state, req.id)
   },
 
   REQUEST_DESELECT (state) {
@@ -65,6 +93,18 @@ const mutations = {
     })
   },
 
+  REQUEST_EDIT_BODY (state, {id, newBody}) {
+    applyFor(id, (req) => {
+      req.body = newBody
+    })
+  },
+
+  REQUEST_EDIT_HEADERS (state, {id, newHeaders}) {
+    applyFor(id, (req) => {
+      req.headers = newHeaders
+    })
+  },
+
   RESPONSE_ADD (state, response) {
     state.responses.push(response)
   },
@@ -79,7 +119,9 @@ const mutations = {
 }
 
 const actions = {
+  requestClear ({ commit }) { commit('REQUEST_CLEAR') },
   requestCreate ({ commit }) { commit('REQUEST_CREATE') },
+  requestAdd ({ commit }, req) { commit('REQUEST_ADD', req) },
   requestDeselect ({ commit }) { commit('REQUEST_DESELECT') },
   requestDeleteActive ({ commit }) {
     if (!confirm('Delete this request? You are sure?')) {
@@ -89,18 +131,11 @@ const actions = {
     commit('REQUEST_DELETE_ACTIVE')
   },
   requestSetActive ({ commit }, id) { commit('REQUEST_SET_ACTIVE', id) },
-
-  requestSetUrl ({ commit }, {id, newUrl}) {
-    commit('REQUEST_EDIT_URL', {id, newUrl})
-  },
-
-  requestSetMethod ({ commit }, {id, newMethod}) {
-    commit('REQUEST_EDIT_METHOD', {id, newMethod})
-  },
-
-  requestSetResponse ({ commit }, {id, responseId}) {
-    commit('REQUEST_SET_RESPONSE_ID', {id, responseId})
-  },
+  requestSetUrl ({ commit }, {id, newUrl}) { commit('REQUEST_EDIT_URL', {id, newUrl}) },
+  requestSetMethod ({ commit }, {id, newMethod}) { commit('REQUEST_EDIT_METHOD', {id, newMethod}) },
+  requestSetBody ({ commit }, {id, newBody}) { commit('REQUEST_EDIT_BODY', {id, newBody}) },
+  requestSetHeaders ({ commit }, {id, newHeaders}) { commit('REQUEST_EDIT_HEADERS', {id, newHeaders}) },
+  requestSetResponse ({ commit }, {id, responseId}) { commit('REQUEST_SET_RESPONSE_ID', {id, responseId}) },
 
   responseAdd ({ commit }, response) { commit('RESPONSE_ADD', response) },
   responseInit ({ commit }, {id, blob, parsed, type}) {

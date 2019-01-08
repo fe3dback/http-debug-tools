@@ -6,6 +6,19 @@ const Environment = function (name) {
   this.data = '{}'
 }
 
+export function serialize (env) {
+  return {
+    name: env.name,
+    data: env.data
+  }
+}
+
+export function unserialize (state) {
+  let env = new Environment(state.name)
+  env.data = state.data
+  return env
+}
+
 export function clone (srcEnv) {
   let newEnv = new Environment(srcEnv.name + ' clone')
   newEnv.data = srcEnv.data

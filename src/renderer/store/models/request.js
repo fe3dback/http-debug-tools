@@ -1,6 +1,4 @@
 import uuid4 from 'uuid4'
-// import Response from './response'
-// import fetch from 'node-fetch'
 
 const Request = function (method, url) {
   // request
@@ -10,6 +8,22 @@ const Request = function (method, url) {
   this.body = '{}'
   this.headers = '{}'
   this.lastResponseId = null
+}
+
+export function serialize (req) {
+  return {
+    url: req.url,
+    method: req.method,
+    body: req.body,
+    headers: req.headers
+  }
+}
+
+export function unserialize (state) {
+  let req = new Request(state.method, state.url)
+  req.body = state.body
+  req.headers = state.headers
+  return req
 }
 
 export function requestHTTPMethods () {
