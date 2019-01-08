@@ -6,16 +6,16 @@
                 :class="{'active': request.id === activeId}"
                 v-for="request in list"
                 :key=request.id
-                @click="request.setAsActive()"
+                @click="requestSetActive(request.id)"
             >
                 <span class="row">
                     <span class="col-2">
-                        <span class="badge" :class="`badge-${request.methodType()}`">
+                        <span class="badge" :class="`badge-${getBadgeClass(request)}`">
                             {{request.method}}
                         </span>
                     </span>
                     <span class="col-10 text-right">
-                        <span class="request-url">{{request.getUrlShort(20)}}</span>
+                        <span class="request-url">{{getShortUrl(request, 20)}}</span>
                     </span>
                 </span>
             </a>
@@ -31,6 +31,7 @@
 
 <script>
     import {mapState, mapActions} from 'vuex'
+    import {getUrlShort} from '../../../store/models/request'
     import SidebarModelActions from '../sidebar-model-actions'
     export default {
       name: 'request-list',
@@ -45,8 +46,24 @@
         ...mapActions([
           'requestCreate',
           'requestDeselect',
+          'requestSetActive',
           'requestDeleteActive'
-        ])
+        ]),
+        getShortUrl (req) {
+          return getUrlShort(req)
+        },
+        getBadgeClass (req) {
+          switch (req.method) {
+            case 'GET': return 'success'
+            case 'HEAD': return 'dark'
+            case 'POST': return 'warning'
+            case 'PUT': return 'info'
+            case 'PATCH': return 'primary'
+            case 'DELETE': return 'danger'
+            case 'OPTIONS': return 'secondary'
+            default: return 'light'
+          }
+        }
       }
     }
 </script>

@@ -1,7 +1,6 @@
-import store from '../index'
 import uuid4 from 'uuid4'
-import Response from './response'
-import fetch from 'node-fetch'
+// import Response from './response'
+// import fetch from 'node-fetch'
 
 const Request = function (method, url) {
   // request
@@ -13,67 +12,17 @@ const Request = function (method, url) {
   this.lastResponseId = null
 }
 
-Request.prototype.methods = function () {
+export function requestHTTPMethods () {
   return [
     'GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'
   ]
 }
 
-Request.prototype.methodType = function () {
-  switch (this.method) {
-    case 'GET': return 'success'
-    case 'HEAD': return 'dark'
-    case 'POST': return 'warning'
-    case 'PUT': return 'info'
-    case 'PATCH': return 'primary'
-    case 'DELETE': return 'danger'
-    case 'OPTIONS': return 'secondary'
-    default: return 'light'
+export function getUrlShort (request, length) {
+  if (request.url.length <= length) {
+    return request.url
   }
-}
-
-Request.prototype.send = function () {
-  let tStart = performance.now()
-  fetch(this.url)
-    .then((res) => {
-      let tEnd = performance.now()
-      let response = new Response(res, tEnd - tStart)
-
-      store.dispatch('responseAdd', response)
-      store.dispatch('requestSetResponse', {
-        id: this.id,
-        responseId: response.id
-      })
-    })
-    .catch((reason) => {
-      // todo show warning
-      console.error(reason)
-    })
-}
-
-Request.prototype.getUrlShort = function (length) {
-  if (this.url.length <= length) {
-    return this.url
-  }
-  return '..' + this.url.substr(this.url.length - length)
-}
-
-Request.prototype.setAsActive = function () {
-  store.dispatch('requestSetActive', this.id)
-}
-
-Request.prototype.onEditUrl = function (newUrl) {
-  store.dispatch('requestSetUrl', {
-    id: this.id,
-    newUrl
-  })
-}
-
-Request.prototype.onEditMethod = function (newMethod) {
-  store.dispatch('requestSetMethod', {
-    id: this.id,
-    newMethod
-  })
+  return '..' + request.url.substr(request.url.length - length)
 }
 
 export default Request

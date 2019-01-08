@@ -1,4 +1,4 @@
-import Environment from '../models/environment'
+import Environment, {clone} from '../models/environment'
 
 let applyFor = function (id, cb) {
   state.list.map(function (env) {
@@ -44,7 +44,7 @@ const mutations = {
     }
 
     applyFor(state.activeId, (env) => {
-      let newEnv = env.clone()
+      let newEnv = clone(env)
       state.list.push(newEnv)
       mutations.ENV_SET_ACTIVE(state, newEnv.id)
     })

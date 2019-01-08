@@ -11,26 +11,6 @@
         <sidebar-card title="Requests">
           <request-list></request-list>
         </sidebar-card>
-        <sidebar-card title="Application db">
-          <div class="btn-group">
-            <sidebar-model-actions-btn
-              title="Import.."
-              icon="file-import">
-            </sidebar-model-actions-btn>
-            <sidebar-model-actions-btn
-              title="Export.."
-              icon="file-export">
-            </sidebar-model-actions-btn>
-            <sidebar-model-actions-btn
-              title="Save"
-              icon="download">
-            </sidebar-model-actions-btn>
-            <sidebar-model-actions-btn
-              title="Load"
-              icon="upload">
-            </sidebar-model-actions-btn>
-          </div>
-        </sidebar-card>
       </div>
       <div class="col-8 col-lg-9">
         <working-pane></working-pane>
@@ -40,6 +20,7 @@
 </template>
 
 <script>
+  import {ipcRenderer} from 'electron'
   import RequestList from './sidebar/request/RequestList'
   import WorkingPane from './workingPane/workingPane'
   import SidebarCard from './sidebar/sidebar-card'
@@ -55,6 +36,17 @@
       SidebarCard,
       WorkingPane,
       RequestList
+    },
+    created () {
+      ipcRenderer.on('vuex-undo', () => {
+        // todo undo
+        console.log('undo')
+      })
+
+      ipcRenderer.on('vuex-redo', () => {
+        // todo redo
+        console.log('redo')
+      })
     }
   }
 </script>

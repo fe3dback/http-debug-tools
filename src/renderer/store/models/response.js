@@ -24,14 +24,11 @@ const Response = function (res, time) {
     this.headers[key] = value
   })
 
-  res.text()
-    .then((blob) => {
-      this.init(blob)
-    })
+  res.text().then((blob) => init(this, blob))
 }
 
-Response.prototype.init = function (blob) {
-  let type = this.getType()
+let init = function (response, blob) {
+  let type = getType(response)
   let parsed = null
 
   // format json
@@ -48,29 +45,16 @@ Response.prototype.init = function (blob) {
   }
 
   store.dispatch('responseInit', {
-    id: this.id, blob, parsed, type
+    id: response.id, blob, parsed, type
   })
 }
 
-Response.prototype.getCodeClassType = function () {
-  if (this.code >= 500) {
-    return 'danger'
-  } else if (this.code >= 400) {
-    return 'warning'
-  } else if (this.code >= 300) {
-    return 'info'
-  } else if (this.code >= 200) {
-    return 'success'
-  }
-  return 'secondary'
-}
-
-Response.prototype.getType = function () {
-  if (!this.headers['content-type']) {
+export function getType (response) {
+  if (!response.headers['content-type']) {
     return TYPE_TEXT
   }
 
-  let contentType = contentTypeParser(this.headers['content-type'])
+  let contentType = contentTypeParser(response.headers['content-type'])
 
   // json
   if (contentType.type === 'application' && contentType.subtype === 'json') {

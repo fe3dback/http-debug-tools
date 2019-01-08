@@ -3,7 +3,7 @@
         <i class="fa" :class="`fa-${icon}`"></i>
         <span
             :title=title
-            class="d-none d-lg-inline-block"
+            class="d-none d-xl-inline-block"
             data-toggle="tooltip"
             data-placement="bottom"
         >

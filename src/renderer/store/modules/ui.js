@@ -19,7 +19,7 @@ const mutations = {
 }
 
 const actions = {
-  requestSetActive ({ commit }, mode) {
+  uiSetMode ({ commit }, mode) {
     if (UI_MODE_LIST.indexOf(mode) === -1) {
       console.error(`Unknown UI mode ${mode}`)
       return

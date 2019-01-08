@@ -9,7 +9,7 @@
                 <tabs-tab id="response">
                     Response
                     <template v-if="response">
-                        <span class="badge" :class="`badge-${response.getCodeClassType()}`">
+                        <span class="badge" :class="`badge-${getCodeClassType(response)}`">
                             {{response.status}} {{response.code}}
                         </span>
                         <span class="badge badge-dark">
@@ -109,6 +109,20 @@
       TabsTab,
       Tabs,
       RequestSettingsBar
+    },
+    methods: {
+      getCodeClassType (response) {
+        if (response.code >= 500) {
+          return 'danger'
+        } else if (response.code >= 400) {
+          return 'warning'
+        } else if (response.code >= 300) {
+          return 'info'
+        } else if (response.code >= 200) {
+          return 'success'
+        }
+        return 'secondary'
+      }
     },
     computed: {
       ...mapState({

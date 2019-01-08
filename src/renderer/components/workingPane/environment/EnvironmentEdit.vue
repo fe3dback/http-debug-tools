@@ -1,6 +1,6 @@
 <template>
     <div class="env-edit">
-        <h5>Edit environment:</h5>
+        <h5 class="d-none d-xl-block">Edit environment:</h5>
         <input class="form-control" aria-label="env name" :value=env.name />
         <hr />
         <div class="row">
@@ -20,7 +20,7 @@
                         </tabs-tab-content>
                         <tabs-tab-content id="env-var-preview">
                             <app-editor
-                                :value=env.getComputedVariablesForPreview()
+                                :value=preview
                                 :read-only=true
                                 lang="json"
                                 height="400px"
@@ -36,7 +36,7 @@
                     fields like <b v-pre>{{varname}}</b>
                     will be replaced to env value.
                 </p>
-                <div class="d-none d-lg-block">
+                <div class="d-none d-xl-block">
                     <p>
                         - You can clone existing environments and
                         change only different variables
@@ -56,6 +56,8 @@
     </div>
 </template>
 <script>
+  import {getComputedVariablesForPreview} from '../../../store/models/environment'
+  import {mapActions} from 'vuex'
   import Tabs from '../../shared/tabs'
   import TabsTab from '../../shared/tabs-tab'
   import TabsTabContent from '../../shared/tabs-tab-content'
@@ -65,8 +67,19 @@
     props: ['env'],
     components: {AppEditor, TabsTabContent, TabsTab, Tabs},
     methods: {
-      onVariablesUpdate (val) {
-        this.env.updateVariables(val)
+      ...mapActions([
+        'envUpdateVariables'
+      ]),
+      onVariablesUpdate (vars) {
+        this.envUpdateVariables({
+          id: this.env.id,
+          vars
+        })
+      }
+    },
+    computed: {
+      preview () {
+        return getComputedVariablesForPreview(this.env)
       }
     }
   }

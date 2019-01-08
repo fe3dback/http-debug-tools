@@ -6,7 +6,7 @@
                     class="list-group-item list-group-item-action"
                     :class="{'active': env.id === activeId}"
                     :key=env.id
-                    @click="env.setAsActive()"
+                    @click="envSetActive(env.id)"
                 >
                     {{env.name}}
                     <span class="badge badge-dark text-warning" v-if="env.id === activeId">
@@ -54,6 +54,7 @@
       methods: {
         ...mapActions([
           'envCreate',
+          'envSetActive',
           'envDeleteActive',
           'envCloneActive'
         ]),
