@@ -1,72 +1,49 @@
 <template>
     <div class="request-edit">
         <template v-if="request">
-            <request-settings-bar :request=request></request-settings-bar>
-
-            <tabs active-tab-id="request">
-                <tabs-tab id="request">Request</tabs-tab>
-                <tabs-tab id="response">
-                    Response
-                    <template v-if="response">
+            <div class="row">
+                <div class="col-9 col-xl-10">
+                    <request-settings-bar :request=request></request-settings-bar>
+                </div>
+                <div class="col-3 col-xl-2">
+                    <div v-if="response" class="alert alert-dark pt-2 pb-2 pl-1 pr-1 text-center">
                         <span class="badge" :class="`badge-${getCodeClassType(response)}`">
                             {{response.status}} {{response.code}}
                         </span>
                         <span class="badge badge-dark">
                             {{response.time}} ms
                         </span>
-                    </template>
-                </tabs-tab>
-                <tabs-tab id="sql" disabled=true>
-                    <i class="fa fa-database"></i>
-                    SQL
-                </tabs-tab>
-                <tabs-tab id="logs" disabled=true>
-                    <i class="fa fa-file-alt"></i>
-                    Logs
-                </tabs-tab>
-                <tabs-tab id="routes" disabled=true>
-                    <i class="fa fa-route"></i>
-                    Routes
-                </tabs-tab>
-                <tabs-tab id="acl" disabled=true>
-                    <i class="fa fa-lock-open"></i>
-                    ACL
-                </tabs-tab>
-                <template slot="content">
-                    <tabs-tab-content id="request">
-                        <form>
-                            <div class="form-group">
-                                <label>Body:</label>
-                                <app-editor
-                                    lang="json"
-                                    :value=request.body
-                                    @input=onEditBody
-                                    height="200px">
-                                </app-editor>
-                            </div>
-                            <div class="form-group">
-                                <label>Headers:</label>
-                                <app-editor
-                                    lang="json"
-                                    :value=request.headers
-                                    @input=onEditHeaders
-                                    height="200px">
-                                </app-editor>
-                            </div>
-                        </form>
-                    </tabs-tab-content>
-                    <tabs-tab-content id="response">
-                        <template v-if="response">
-                            <response-preview :request=request :response=response></response-preview>
-                        </template>
-                        <template v-else>
-                            <div class="alert alert-info">
-                                Send request to server first..
-                            </div>
-                        </template>
-                    </tabs-tab-content>
-                </template>
-            </tabs>
+                    </div>
+                </div>
+            </div>
+
+            <div class="entire-edit">
+                <div class="row">
+                    <div class="col-5">
+                        <tabs active-tab-id="body">
+                            <tabs-tab id="body">Body</tabs-tab>
+                            <tabs-tab id="headers">Headers</tabs-tab>
+                            <template slot="content">
+                                <tabs-tab-content id="body">
+                                    <app-editor
+                                        lang="json"
+                                        :value=request.body
+                                        @input=onEditBody></app-editor>
+                                </tabs-tab-content>
+                                <tabs-tab-content id="headers">
+                                    <app-editor
+                                        lang="json"
+                                        :value=request.headers
+                                        @input=onEditHeaders></app-editor>
+                                </tabs-tab-content>
+                            </template>
+                        </tabs>
+                    </div>
+                    <div class="col-7">
+                        <response-preview :request=request :response=response></response-preview>
+                    </div>
+                </div>
+            </div>
         </template>
         <template v-else>
             <div class="mt-5"></div>
@@ -173,17 +150,3 @@
     }
   }
 </script>
-
-<style>
-    .debug-zone {
-        max-width: 100%;
-        max-height: 500px;
-        overflow: auto;
-        border: 1px solid orangered;
-        padding: 5px;
-    }
-
-    .debug-zone pre {
-        overflow: visible;
-    }
-</style>
