@@ -1,28 +1,214 @@
-# http-dev-tools
+HTTP Debug tools
+=
 
-> HTTP Development tools with debug bar (sql, logs, templates, routes, etc..)
+This is HTTP GUI client (like postman), for debuging APIs using HTTP Debug protocol.
 
-#### Build Setup
+HTTP Debug protocol
+=
 
-``` bash
-# install dependencies
-npm install
+Types
+==
 
-# serve with hot reload at localhost:9080
-npm run dev
+<table>
+  <thead>
+    <tr>
+      <td>name</td>
+      <td>title</td>
+      <td>example</td>
+      <td>definition</td>
+    </tr>
+  <thead/>
+  <tbody>
+    <tr>
+      <td>guid</td>
+      <td>rfc4122 (UUID v4)</td>
+      <td>5b67d5ef-b9cc-4a3e-896d-93e5f4500e09</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>ts_mili</td>
+      <td>unixtime (GMT) with miliseconds</td>
+      <td>1547058561177</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>duration_mili</td>
+      <td>time duration in miliseconds</td>
+      <td>140</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>method</td>
+      <td>HTTP Method (uppercase)</td>
+      <td>POST</td>
+      <td>[GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS]</td>
+    </tr>
+    <tr>
+      <td>uri</td>
+      <td>URI</td>
+      <td>https://example.com/api/hello?foo=bar</td>
+      <td>[wiki](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax)</td>
+    </tr>
+    <tr>
+      <td>header</td>
+      <td>Header object</td>
+<td>
 
-# build electron application for production
-npm run build
+  ```json
+  {
+    "key": "headerName", 
+    "value": "headerValue"
+  }
+  ```
+</td>
+<td>
+  
+  - string:key
+  - string:value
+</td>
+    </tr>
+    <tr>
+      <td>param</td>
+      <td>Param object</td>
+<td>
 
-# run unit & end-to-end tests
-npm test
+  ```json
+  {
+    "key": "paramName", 
+    "value": "paramValue"
+  }
+  ```
+</td>
+<td>
+  
+  - string:key
+  - string:value
+</td>
+    </tr>
+    <tr>
+      <td>user</td>
+      <td>User object</td>
+<td>
+  
+  ```json
+  {
+    "id": "12345", 
+    "name": "admin",
+    "groups": [{
+      "id": "42",
+      "title": "editors",
+      "perms": [{
+        "key": "view",
+        "value": "articles"
+      }]
+    }]
+  }
+  ```
+</td>
+<td>
 
+- string:id
+- ?string:name
+- ?string:email
+- ?userGroup[]:groups
+</td>
+    </tr>
+    <tr>
+      <td>userGroup</td>
+      <td>UserGroup object</td>
+<td>
+  
+  ```json
+  {
+    "id": "42",
+    "title": "editors",
+    "perms": [{
+      "key": "view",
+      "value": "articles"
+    }]
+  }
+  ```
+</td>
+<td>
+  
+  - string:id
+  - ?string:title
+  - ?param[]:perms
+</td>
+    </tr>
+    <tr>
+      <td>db_query</td>
+      <td>Database query object</td>
+<td>
+  
+  ```json
+{
+  "query": "SELECT * FROM articles WHERE ID = ?id",
+  "parsed": "SELECT * FROM articles WHERE ID = 1;",
+  "duration": 15,
+  "bindings": [{
+    "key": "id",
+    "value": "2"
+  }]
+}
+  ```
+</td>
+<td>
+  
+- string:query
+- ?string:parsed
+- ?duration_mili:duration
+- ?param[]:bindings
+</td>
+    </tr>
+  </tbody>
+</table>
 
-# lint all JS/Vue component files in `src/`
-npm run lint
+Schema (v1)
+==
 
-```
+Required
+====
 
----
+| key | type | description |
+| --- | ---- | ----------- |
+| id | guid  | unique request id |
+| version | int | schema version |
+| request_in | ts_mili | request in time |
+| response_out | ts_mili | response out time |
 
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[8fae476](https://github.com/SimulatedGREG/electron-vue/tree/8fae4763e9d225d3691b627e83b9e09b56f6c935) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+Optional
+====
+
+| key | type | description |
+| --- | ---- | ----------- |
+| method | method  | HTTP method |
+| uri | uri | full request uri |
+| headers | header[] | list of request headers |
+| controller | string | custom controller name |
+| query_data | param[] | parsed query (GET) data |
+| post_data | param[] | parsed body (POST) data |
+| session | param[] | user session data |
+| user | user | current auth user |
+| response_code | int | HTTP response code |
+| memory_usage_bytes | int | max/peak memory usage (in bytes) during request |
+| queries | db_query[] | database queries during request |
+| cache_total_count | int | cache read requests count |
+| cache_hits_count | int | cache hit requests count |
+| cache_writes_count | int | cache write requests count |
+| cache_deletes_count | int | cache delete requests count |
+| cache_duration | duration_mili | total cache io duration in ms |
+
+Todo
+====
+
+| key | type | description |
+| --- | ---- | ----------- |
+| timeline | todo | n/a |
+| logs | todo | n/a |
+| events | todo | n/a |
+| routes | todo | n/a |
+| emails | todo | n/a |
+| views | todo | n/a |
+| async_requests | todo | n/a |
+| sub_requests | todo | n/a |
