@@ -6,6 +6,50 @@ This is HTTP GUI client (like postman), for debuging APIs using HTTP Debug proto
 HTTP Debug protocol
 =
 
+```text
+
+
+                     +-----------------------------------------------+
+   +---------------+ |                                               | +---------------+
+   |  HTTP CLIENT  | |            HOW HTTP DEBUG WORKS?              | | APP. BACKEND  |
+   +---------------+ |                                               | +---------------+
+                     +-----------------------------------------------+
+
+   ----------------------------+   +             +   +----------------------------------
+    Any HTTP Request           |   | REAL        |   | Response headers:
+   ----------------------------+   | REQUEST     |   +----------------------------------
+                               +-> | +---------> |   | X-Http-Debug-Version: 1.0
+    /api/my-url/?hello-world   |   |             |   |
+                               |   |        REAL |   | X-Http-Debug-Api: /_profile/?id=
+   ----------------------------+   |    RESPONSE |   |
+                                   | <---------+ | <-+ X-Http-Debug-Id: 5b67d5...e09
+                                   |             |   +----------------------------------
+                                   |             |
+                                   |     ...     |   +----------------------------------
+   ----------------------------+   |             |   | Json response with debug data:
+    Request url:               |   |             |   +----------------------------------
+   ----------------------------+   | DEBUG       |   | {
+                               |   | REQUEST     |   |   "id": "5b67d5...e09",
+    /_profile/?id=5b67d5...e09 +-> | +---------> |   |   "request_in": 1547058561177,
+                               |   |             |   |   "response_out": 1547058622423,
+   ----------------------------+   |       DEBUG |   |   "controller": "MyController",
+                                   |    RESPONSE |   |   "cache_hits_count": 14,
+                                   | <---------+ | <-+   ...
+                                   |             |   | }
+                                   +             +   +---------------------------------+
+
+
+Steps:
+1. HTTP Client make real request to application server
+2. Server return real response, with 3 debug headers
+3. HTTP Client make request to debug/profile server url
+4. Server return all debug information for request #1
+```
+
+This schema can by implement for any programming language and backend.
+Also any HTTP clients (like postman, insomnia, chrome dev tools, my custom client, etc..) can
+implement debug information display.
+
 Types
 ==
 
@@ -13,7 +57,6 @@ Types
   <thead>
     <tr>
       <td>name</td>
-      <td>title</td>
       <td>example</td>
       <td>definition</td>
     </tr>
@@ -21,37 +64,34 @@ Types
   <tbody>
     <tr>
       <td>guid</td>
-      <td>rfc4122 (UUID v4)</td>
       <td>5b67d5ef-b9cc-4a3e-896d-93e5f4500e09</td>
-      <td></td>
+      <td>rfc4122 (UUID v4)</td>
     </tr>
     <tr>
       <td>ts_mili</td>
-      <td>unixtime (GMT) with miliseconds</td>
       <td>1547058561177</td>
-      <td></td>
+      <td>unixtime (GMT) with miliseconds</td>
     </tr>
     <tr>
       <td>duration_mili</td>
-      <td>time duration in miliseconds</td>
       <td>140</td>
-      <td></td>
+      <td>time duration in miliseconds</td>
     </tr>
     <tr>
       <td>method</td>
-      <td>HTTP Method (uppercase)</td>
       <td>POST</td>
-      <td>[GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS]</td>
+      <td>HTTP Method (uppercase) [GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS]</td>
     </tr>
     <tr>
       <td>uri</td>
-      <td>URI</td>
       <td>https://example.com/api/hello?foo=bar</td>
-      <td>[wiki](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax)</td>
+<td
+  
+  [wiki](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier)
+</td>
     </tr>
     <tr>
       <td>header</td>
-      <td>Header object</td>
 <td>
 
   ```json
@@ -63,13 +103,12 @@ Types
 </td>
 <td>
   
-  - string:key
-  - string:value
+  - *string*:key
+  - *string*:value
 </td>
     </tr>
     <tr>
       <td>param</td>
-      <td>Param object</td>
 <td>
 
   ```json
@@ -81,13 +120,12 @@ Types
 </td>
 <td>
   
-  - string:key
-  - string:value
+  - *string*:key
+  - *string*:value
 </td>
     </tr>
     <tr>
       <td>user</td>
-      <td>User object</td>
 <td>
   
   ```json
@@ -107,15 +145,14 @@ Types
 </td>
 <td>
 
-- string:id
-- ?string:name
-- ?string:email
-- ?userGroup[]:groups
+- *string*:id
+- ?*string*:name
+- ?*string*:email
+- ?*userGroup*[]:groups
 </td>
     </tr>
     <tr>
       <td>userGroup</td>
-      <td>UserGroup object</td>
 <td>
   
   ```json
@@ -131,34 +168,33 @@ Types
 </td>
 <td>
   
-  - string:id
-  - ?string:title
-  - ?param[]:perms
+  - *string*:id
+  - ?*string*:title
+  - ?*param*[]:perms
 </td>
     </tr>
     <tr>
       <td>db_query</td>
-      <td>Database query object</td>
 <td>
   
   ```json
-{
-  "query": "SELECT * FROM articles WHERE ID = ?id",
-  "parsed": "SELECT * FROM articles WHERE ID = 1;",
-  "duration": 15,
-  "bindings": [{
-    "key": "id",
-    "value": "2"
-  }]
-}
+  {
+    "query": "SELECT * FROM articles WHERE ID = ?id",
+    "parsed": "SELECT * FROM articles WHERE ID = 1;",
+    "duration": 15,
+    "bindings": [{
+      "key": "id",
+      "value": "2"
+    }]
+  }
   ```
 </td>
 <td>
   
-- string:query
-- ?string:parsed
-- ?duration_mili:duration
-- ?param[]:bindings
+- *string*:query
+- ?*string*:parsed
+- ?*duration_mili*:duration
+- ?*param*[]:bindings
 </td>
     </tr>
   </tbody>
