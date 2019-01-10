@@ -46,7 +46,7 @@ Steps:
 4. Server return all debug information for request #1
 ```
 
-This schema can by implement for any programming language and backend.
+This schema can by implement on any programming language and backend.
 Also any HTTP clients (like postman, insomnia, chrome dev tools, my custom client, etc..) can
 implement debug information display.
 
@@ -148,11 +148,11 @@ Types
 - *string*:id
 - ?*string*:name
 - ?*string*:email
-- ?*userGroup*[]:groups
+- ?*user_group*[]:groups
 </td>
     </tr>
     <tr>
-      <td>userGroup</td>
+      <td>user_group</td>
 <td>
   
   ```json
