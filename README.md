@@ -10,4 +10,4 @@ status:
 - [x] reponses
 - [x] storage
 - [x] save/load
-- [ ] implement http debug protocol (http://localhost:8080/web-debug-proto/)
+- [ ] implement http debug protocol (https://fe3dback.github.io/web-debug-proto/)
