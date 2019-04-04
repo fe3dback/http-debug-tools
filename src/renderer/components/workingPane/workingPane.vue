@@ -1,6 +1,8 @@
 <template>
-    <div class="working-pane pt-3">
-        <request-edit></request-edit>
+    <div class="row working-pane pt-2">
+        <div class="col">
+            <request-edit></request-edit>
+        </div>
     </div>
 </template>
 

@@ -2,7 +2,7 @@
     <div class="preview-editor">
         <template v-if="value">
             <app-editor
-                height="450px"
+                height="500px"
                 :lang=lang
                 :value=value
                 :read-only=true>

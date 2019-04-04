@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid root-app">
     <div class="row h-100">
-      <div class="col-4 col-xl-3 sidebar pt-2">
+      <div class="col-4 col-xl-3 r-sidebar pt-2">
         <sidebar-card title="Environments">
           <environment-list></environment-list>
         </sidebar-card>
@@ -12,7 +12,7 @@
           <request-list></request-list>
         </sidebar-card>
       </div>
-      <div class="col-8 col-xl-9">
+      <div class="col-8 col-xl-9 r-content">
         <working-pane></working-pane>
       </div>
     </div>
@@ -53,17 +53,21 @@
 
 <style>
   .root-app {
-    border-top: 3px solid #122125;
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
-  .sidebar {
+  .r-sidebar {
+    border-right: 1px solid #122125;
+  }
+  .r-sidebar, .r-content {
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    border-right: 1px solid #122125;
   }
 </style>

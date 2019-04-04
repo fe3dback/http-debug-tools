@@ -6,7 +6,7 @@
 
         theme="github"
         width="100%"
-        :height=height
+        :height="height || '500px'"
 
         @init="editorInit"
     ></editor>
