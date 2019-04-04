@@ -19,10 +19,36 @@ const Response = function (res, time) {
   this.status = res.statusText || null
   this.time = time.toFixed(2)
   this.headers = {}
+  this.profiler = {
+    transport: null,
+    transportOptions: {},
+    scheme: {}
+  }
 
   res.headers.forEach((value, key) => {
     this.headers[key] = value
+
+    if (key.toLowerCase() === 'x-http-debug-id') {
+      this.profiler.transport = 'fetchApi'
+      this.profiler.transportOptions['uuid'] = value
+    }
+
+    if (key.toLowerCase() === 'x-http-debug-api') {
+      this.profiler.transport = 'fetchApi'
+      this.profiler.transportOptions['endpoint'] = value
+    }
   })
+
+  if (this.profiler.transport === 'fetchApi') {
+    let tOpts = this.profiler.transportOptions
+    if (!tOpts.uuid || !tOpts.endpoint) {
+      console.warn('Api not return both required transport properties, profiling is not possible :(')
+      console.info(this.profiler.transport)
+      this.profiler.transport = null
+      this.profiler.transportOptions = {}
+      this.profiler.scheme = {}
+    }
+  }
 
   res.text().then((blob) => init(this, blob))
 }
@@ -30,6 +56,7 @@ const Response = function (res, time) {
 let init = function (response, blob) {
   let type = getType(response)
   let parsed = null
+  let profiler = response.profiler
 
   // format json
   if (type === TYPE_JSON) {
@@ -37,6 +64,15 @@ let init = function (response, blob) {
       let jsonObject = JSON.parse(blob)
       if (jsonObject) {
         parsed = JSON.stringify(jsonObject, null, 2)
+
+        // check transport json injected
+        if (jsonObject['_x_http_debug']) {
+          profiler = {
+            scheme: jsonObject['_x_http_debug'],
+            transport: 'injected',
+            transportOptions: {}
+          }
+        }
       }
     } catch (e) {
       // todo show warning message
@@ -46,7 +82,7 @@ let init = function (response, blob) {
   }
 
   store.dispatch('responseInit', {
-    id: response.id, blob, parsed, type
+    id: response.id, blob, parsed, type, profiler
   })
 }
 

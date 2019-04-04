@@ -4,8 +4,11 @@
             <request-settings-bar :request=request></request-settings-bar>
 
             <tabs active-tab-id="request">
-                <tabs-tab id="request">Request</tabs-tab>
+                <tabs-tab id="request">
+                    Request
+                </tabs-tab>
                 <tabs-tab id="response">
+                    <i class="fa fa-bolt"></i>
                     Response
                     <template v-if="response">
                         <span class="badge" :class="`badge-${getCodeClassType(response)}`">
@@ -16,22 +19,11 @@
                         </span>
                     </template>
                 </tabs-tab>
-                <tabs-tab id="sql" disabled=true>
-                    <i class="fa fa-database"></i>
-                    SQL
+                <tabs-tab id="profile" :disabled="!response">
+                    <i class="fa fa-bug"></i>
+                    Profile
                 </tabs-tab>
-                <tabs-tab id="logs" disabled=true>
-                    <i class="fa fa-file-alt"></i>
-                    Logs
-                </tabs-tab>
-                <tabs-tab id="routes" disabled=true>
-                    <i class="fa fa-route"></i>
-                    Routes
-                </tabs-tab>
-                <tabs-tab id="acl" disabled=true>
-                    <i class="fa fa-lock-open"></i>
-                    ACL
-                </tabs-tab>
+
                 <template slot="content">
                     <tabs-tab-content id="request">
                         <form>
@@ -65,6 +57,22 @@
                             </div>
                         </template>
                     </tabs-tab-content>
+                    <tabs-tab-content id="profile" v-if="response">
+                        <template v-if="response.profiler && response.profiler.scheme">
+                            <response-profiler :scheme=response.profiler.scheme></response-profiler>
+                        </template>
+                        <template v-else>
+                            Current response not have profile data?
+
+                            Debug:
+                            <app-editor
+                                height="450px"
+                                lang="json"
+                                :value="JSON.stringify(response.profiler)"
+                                :read-only=true>
+                            </app-editor>
+                        </template>
+                    </tabs-tab-content>
                 </template>
             </tabs>
         </template>
@@ -96,6 +104,7 @@
   import TabsTabContent from '../../shared/tabs-tab-content'
   import AppEditor from '../../shared/editor'
   import ResponsePreview from '../response/responsePreview'
+  import ResponseProfiler from '../response/responseProfiler'
   export default {
     name: 'request-edit',
     data () {
@@ -106,6 +115,7 @@
       }
     },
     components: {
+      ResponseProfiler,
       ResponsePreview,
       AppEditor,
       TabsTabContent,

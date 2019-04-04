@@ -1,8 +1,19 @@
 import Request, {serialize, unserialize, clone} from '../models/request'
+import {parse} from '../models/environment'
+import store from '../index'
+const UrlParser = require('url-parse')
 
 let applyFor = function (id, cb) {
   state.list.map(function (r) {
     if (r.id === id) {
+      cb(r)
+    }
+  })
+}
+
+let applyForRequestWhenResponseIdIs = function (id, cb) {
+  state.list.map(function (r) {
+    if (r.lastResponseId === id) {
       cb(r)
     }
   })
@@ -129,11 +140,21 @@ const mutations = {
     state.responses.push(response)
   },
 
-  RESPONSE_INIT (state, {id, blob, parsed, type}) {
+  RESPONSE_INIT (state, {id, blob, parsed, type, profiler}) {
     applyForResponse(id, (res) => {
       res.blob = blob
       res.parsed = parsed
       res.type = type
+
+      if (profiler !== null) {
+        res.profiler = profiler
+      }
+    })
+  },
+
+  RESPONSE_SET_PROFILE_SCHEME (state, {id, scheme}) {
+    applyForResponse(id, (res) => {
+      res.profiler.scheme = scheme
     })
   }
 }
@@ -159,8 +180,39 @@ const actions = {
   requestSetResponse ({ commit }, {id, responseId}) { commit('REQUEST_SET_RESPONSE_ID', {id, responseId}) },
 
   responseAdd ({ commit }, response) { commit('RESPONSE_ADD', response) },
-  responseInit ({ commit }, {id, blob, parsed, type}) {
-    commit('RESPONSE_INIT', {id, blob, parsed, type})
+  responseInit ({ commit }, {id, blob, parsed, type, profiler}) {
+    commit('RESPONSE_INIT', {id, blob, parsed, type, profiler})
+
+    if (profiler && profiler.transport === 'fetchApi') {
+      let tOpts = profiler.transportOptions
+      let profileUrl = `${tOpts.endpoint}${tOpts.uuid}`
+
+      if (profileUrl.substring(0, 4) !== 'http') {
+        // if this is relative link, we need to get server uri from Request
+        applyForRequestWhenResponseIdIs(id, (req) => {
+          let env = store.getters.activeEnv
+          let requestUrl = parse(env, req.url)
+          let urlParts = UrlParser(requestUrl)
+
+          // apply default request uri to relative path
+          profileUrl = urlParts.origin + profileUrl
+        })
+      }
+
+      fetch(profileUrl)
+        .then((res) => {
+          res.text().then((scheme) => {
+            commit('RESPONSE_SET_PROFILE_SCHEME', {id, scheme: JSON.parse(scheme)})
+          })
+        })
+        .catch((err) => {
+        // @todo err alert
+          console.error(err)
+        })
+    }
+  },
+  responseSetProfileScheme ({ commit }, {id, scheme}) {
+    commit('RESPONSE_SET_PROFILE_SCHEME', {id, scheme})
   }
 }
 
